@@ -23,7 +23,7 @@
 ### 初始化并运行
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AscentYieldPrivate/signer/refs/heads/main/run.sh > first_run.sh && sh first_run.sh
+curl -fsSL https://raw.githubusercontent.com/AscentYieldPrivate/signer/refs/heads/main/first_run.sh > first_run.sh && sh first_run.sh
 ```
 
 这会让你输入私钥，并将私钥加密保存在本地中，最后会让你输入币安的存钱地址和后台密码
@@ -73,7 +73,7 @@ Sol的Transaction会被序列化，并发送到签名服务器，签名服务器
 
 ### Initialization and run
 ```
-curl -fsSL https://raw.githubusercontent.com/AscentYieldPrivate/signer/refs/heads/main/run.sh > first_run.sh && sh first_run.sh
+curl -fsSL https://raw.githubusercontent.com/AscentYieldPrivate/signer/refs/heads/main/first_run.sh > first_run.sh && sh first_run.sh
 ```
 
 This will prompt you to input a private key, which will be encrypted and saved locally. Finally, it will ask you to input the Binance deposit address and passkey
