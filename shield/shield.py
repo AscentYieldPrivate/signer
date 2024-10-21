@@ -11,11 +11,13 @@ class Shield:
     
     def __init__(self):
         self.address = None
+        count = 0
         for dir in os.listdir("."):
             if dir.startswith("sol_"):
+                count += 1
                 self.address = dir.removeprefix("sol_")
         
-        if not self.address:
+        if count != 1:
             self.address = input("Input your SOL address:")
             if not os.path.exists("sol_" + self.address):
                 raise ValueError("Address not found!")

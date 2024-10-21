@@ -19,13 +19,14 @@ def sign():
     transaction = data.get("transaction")
     sign_address = data.get("sign_address")
     void_keypair = data.get("void_keypair")
+    tokenaddress = data.get("tokenaddress")
     if not transaction or not sign_address:
         return jsonify({"error": "Invalid data"}), 400
     
     req = SolRequest.create(transaction=json.dumps(transaction), sign_address=sign_address, function=function)
     
     try:
-        check_res = check_transaction(transaction, function)
+        check_res = check_transaction(transaction, function, tokenaddress)
         if "error" in check_res:
             req.status = "check_error"
             req.info = check_res["error"]

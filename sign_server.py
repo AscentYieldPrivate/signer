@@ -2,7 +2,7 @@
 from flask import Flask, request, jsonify, g, session
 from orm import database
 from tools.init import run_init
-from signer.client import DEFAULT_SIGHER
+from signer.client import Signer
 from shield import shield
 import sys, getpass, json, datetime
 from gevent.pywsgi import WSGIServer
@@ -27,6 +27,8 @@ def get_server():
     app.config["SECRET_KEY"] = shield.SHIELD.auth_password
     app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=1)
     
+    SIGNER = Signer("localhost", shield.SHIELD.auth_password)
+    
     @app.route('/login', methods=['POST'])
     def login():
         data = g.data
@@ -44,7 +46,7 @@ def get_server():
         data = request.get_json()
         # 解密通讯过程中的数据
         # decrypt the data during the communication
-        data = DEFAULT_SIGHER.decrypt(data["data"])
+        data = SIGNER.decrypt(data["data"])
         if data.get("pass") == shield.SHIELD.address: # 校验地址 check the address
             g.data = data
         else:
@@ -55,7 +57,7 @@ def get_server():
         jsondata = response.get_json()
         # 加密返回的数据
         # encrypt the returned data
-        data = DEFAULT_SIGHER.encrypt(jsondata)
+        data = SIGNER.encrypt(jsondata)
         response.set_data(json.dumps({"data": data}))
         
         return response
@@ -73,7 +75,7 @@ if __name__ == '__main__':
         app.run(host="0.0.0.0", port=8011, debug=False)
     else:
         app = get_server()
-        http_server = WSGIServer(("0.0.0.0", 80), app)
-        print("Server is stated at port 80, you can now close your shell. Signer is running in tmux.")
+        http_server = WSGIServer(("0.0.0.0", int(port)), app)
+        print(f"Server is stated at port {port}, you can now close your shell. Signer is running in tmux.")
         http_server.serve_forever()
     

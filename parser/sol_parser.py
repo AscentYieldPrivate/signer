@@ -19,7 +19,7 @@ def get_associated_token_address(wallet: Pubkey, mint: Pubkey) -> Pubkey:
     )[0]
 
 
-def check_transaction(transaction, function):
+def check_transaction(transaction, function, tokenaddress=""):
     
     t = Transaction.deserialize(bytes.fromhex(transaction))
     
@@ -78,12 +78,19 @@ def check_transaction(transaction, function):
     
     # 验证transfer的目标地址
     # Verify the target address of transfer
+    
+    # get token address
+    if tokenaddress:
+        tokenaddress = Pubkey.from_string(tokenaddress)
+    else:
+        tokenaddress = USDC_MINT # default
+        
     if function == "transfer":
-        if str(t.instructions[0].accounts[0].pubkey) != str(get_associated_token_address(Pubkey.from_string(SHIELD.address), USDC_MINT)):
+        if str(t.instructions[0].accounts[0].pubkey) != str(get_associated_token_address(Pubkey.from_string(SHIELD.address), tokenaddress)):
             return {
                 "error": "Invalid transfer from token address"
             }
-        if str(t.instructions[0].accounts[1].pubkey) != str(get_associated_token_address(Pubkey.from_string(SHIELD.binance_address), USDC_MINT)):
+        if str(t.instructions[0].accounts[1].pubkey) != str(get_associated_token_address(Pubkey.from_string(SHIELD.binance_address), tokenaddress)):
             return {
                 "error": "Invalid transfer to token address"
             }

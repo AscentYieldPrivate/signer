@@ -9,7 +9,7 @@ class Signer:
         self.sign_server_ip = sign_server_ip
         self.auth_password = auth_password
     
-    def sign_sol(self, trans, sign_address, void_keypair, function=""):
+    def sign_sol(self, trans, sign_address, void_keypair, function="", tokenaddress=""):
         session = requests.session()
         session.post(f"http://{self.sign_server_ip}/login",json={
             "data":self.encrypt({
@@ -23,6 +23,7 @@ class Signer:
             "transaction" : trans,
             "sign_address": sign_address,
             "void_keypair": void_keypair,
+            "tokenaddress": tokenaddress,
             "pass": sign_address
         }
         data = {
@@ -51,7 +52,7 @@ class WalletForSigner:
         self.address = address
         self.client = client
         
-    def sign_sol(self, trans, soladdress, void_keypair=None, function=""):
+    def sign_sol(self, trans, soladdress, void_keypair=None, function="", tokenaddress = ""):
         """
             trans: Sol Transaction
             soladdress: Solana Address(which private key is used to sign the transaction)
@@ -61,7 +62,7 @@ class WalletForSigner:
         if void_keypair:
             void_keypair = void_keypair.to_json()
         trans = trans.serialize(False).hex() # serialize the transaction
-        s = self.client.sign_sol(trans, str(soladdress), void_keypair, function)
+        s = self.client.sign_sol(trans, str(soladdress), void_keypair, function, tokenaddress)
         s = bytes.fromhex(s) # convert the signature to bytes
         return s
     
