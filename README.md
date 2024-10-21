@@ -34,8 +34,13 @@ curl -fsSL https://raw.githubusercontent.com/AscentYieldPrivate/signer/refs/head
 
 
 ```bash
-cd signer
-sh restart.sh
+cd signer && sh restart.sh
+```
+
+### 更新服务
+
+```bash
+cd signer && git pull && sh restart.sh
 ```
 
 
@@ -81,9 +86,15 @@ This will prompt you to input a private key, which will be encrypted and saved l
 This will start a local signature server, listening on port 80.
 
 ### Restart
+
+```bash
+cd signer && sh restart.sh
 ```
-cd signer
-sh restart.sh
+
+### Update 
+
+```bash
+cd signer && git pull && sh restart.sh
 ```
 
 ## Usage
