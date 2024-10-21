@@ -1,4 +1,3 @@
-
 import json, base64, getpass, requests, os
 from tools.init import decrypt_data, encrypt_data
 from shield import shield
@@ -6,10 +5,19 @@ from solders.pubkey import Pubkey
 
 class Signer:
     
-    def __init__(self, sign_server_ip):
+    def __init__(self, sign_server_ip, auth_password):
         self.sign_server_ip = sign_server_ip
+        self.auth_password = auth_password
     
     def sign_sol(self, trans, sign_address, void_keypair, function=""):
+        session = requests.session()
+        session.post(f"http://{self.sign_server_ip}/login",json={
+            "data":self.encrypt({
+                "pass": sign_address,
+                "password": self.auth_password
+            })
+        })
+        
         data = {
             "function": function,
             "transaction" : trans,
@@ -18,21 +26,21 @@ class Signer:
             "pass": sign_address
         }
         data = {
-            "data": self.encrypt(data, sign_address)
+            "data": self.encrypt(data)
         }
 
-        res = requests.post(f"http://{self.sign_server_ip}/sol/sign",json=data)
-        return self.decrypt(res.json()["data"], sign_address)["signature"]["result"]
+        res = session.post(f"http://{self.sign_server_ip}/sol/sign",json=data)
+        return self.decrypt(res.json()["data"])["signature"]["result"]
     
-    def encrypt(self, data, key=None):
-        key = key or shield.SHIELD.address # use the shield address as the key to encrypt
+    def encrypt(self, data):
+        key = self.auth_password # use the key to encrypt
         return encrypt_data(key[:10], json.dumps(data).encode()).hex()
     
-    def decrypt(self, data, key=None):
-        key = key or shield.SHIELD.address
+    def decrypt(self, data):
+        key = self.auth_password
         return json.loads(decrypt_data(key[:10], bytes.fromhex(data)).decode())
 
-DEFAULT_SIGHER = Signer("")
+DEFAULT_SIGHER = Signer("localhost:8088", "qwe")
 
 
 # 后台服务器会使用这个类来请求签名服务器

@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify, g
+from flask import Blueprint, request, jsonify, g, session
 from orm.sol_request import SolRequest
 from parser.sol_parser import check_transaction, sign_transaction
+from shield import shield
 import json, traceback
 
 sol_bp = Blueprint('sol', __name__)
@@ -9,6 +10,10 @@ sol_bp = Blueprint('sol', __name__)
 @sol_bp.route('/sign', methods=['POST'])
 def sign():
     data = g.data
+    
+    if "pass" not in session or session["pass"] != shield.SHIELD.auth_password:
+        print("Unauthorized")
+        return jsonify({"error": "Unauthorized"}), 401
 
     function = data.get("function")
     transaction = data.get("transaction")

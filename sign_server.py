@@ -1,11 +1,11 @@
 
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, session
 from orm import database
 from tools.init import run_init
 from signer.client import DEFAULT_SIGHER
 from shield import shield
-import sys, getpass, json
-
+import sys, getpass, json, datetime
+from gevent.pywsgi import WSGIServer
 
 def get_server():
     
@@ -23,6 +23,18 @@ def get_server():
         
     app = Flask(__name__)
     app.register_blueprint(sol_bp, url_prefix='/sol')
+    
+    app.config["SECRET_KEY"] = shield.SHIELD.auth_password
+    app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=1)
+    
+    @app.route('/login', methods=['POST'])
+    def login():
+        data = g.data
+        password = data["password"]
+        if password == shield.SHIELD.auth_password:
+            session["pass"] = shield.SHIELD.auth_password
+            return "ok"
+        return "fail"
     
     @app.before_request
     def before_request_func():
@@ -51,7 +63,8 @@ def get_server():
     return app
 
 if __name__ == '__main__':
-    arg = sys.argv[1] if len(sys.argv) > 1 else "rundebug"
+    arg = sys.argv[1] if len(sys.argv) > 1 else "run"
+    port = sys.argv[2] if len(sys.argv) > 2 else 80
     print(sys.argv)
     if arg == "init": # 初始化密钥 init the private key
         run_init()
@@ -60,5 +73,7 @@ if __name__ == '__main__':
         app.run(host="0.0.0.0", port=8011, debug=False)
     else:
         app = get_server()
-        app.run(host="0.0.0.0", port=80, debug=False)
+        http_server = WSGIServer(("0.0.0.0", 80), app)
+        print("Server is stated at port 80, you can now close your shell. Signer is running in tmux.")
+        http_server.serve_forever()
     

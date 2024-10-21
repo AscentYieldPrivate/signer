@@ -57,14 +57,14 @@ def run_init():
     assert recover_privatekey(enword, private_key_encrypt_for_print_number) == raw_private_key
     
     # create a directory to save the encrypted private key
-    os.makedirs(sol_address, exist_ok=True)
+    os.makedirs("sol_" + sol_address, exist_ok=True)
     
-    with open(sol_address + "/encrypted_private_key.txt", "w") as f:
+    with open("sol_" + sol_address + "/encrypted_private_key.txt", "w") as f:
         f.write(str(private_key_encrypt_for_print_number))
-        print(f"Encrypted private key saved to {sol_address}/encrypted_private_key.txt")
+        print(f"Encrypted private key saved to sol_{sol_address}/encrypted_private_key.txt")
     
     binance_address = input("3. Input your Binance deposit address:")
-    with open(sol_address + "/binance_address.txt", "w") as f:
+    with open("sol_" + sol_address + "/binance_address.txt", "w") as f:
         f.write(str(binance_address))
     
     print("All Done!")
