@@ -1,0 +1,10 @@
+__pycache__
+venv
+*.txt
+.vscode
+*.sh
+!requirements.txt
+!first_run.sh
+!restart.sh
+.DS_Store
+

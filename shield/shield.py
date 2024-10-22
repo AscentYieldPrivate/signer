@@ -1,6 +1,4 @@
 import time, random, os, sys
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
 import contextlib, getpass
 import secrets
 import gc
@@ -35,8 +33,6 @@ class Shield:
         self.simple_password = getpass.getpass("Input your private key password:")
         with self.get_private_key() as private_key:
             assert self.address == str(Keypair.from_base58_string(private_key).pubkey())
-        
-        self.auth_password = getpass.getpass("Input ascent yield auth password:")
         
 
     @contextlib.contextmanager

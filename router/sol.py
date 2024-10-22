@@ -1,19 +1,10 @@
-from flask import Blueprint, request, jsonify, g, session
+
 from orm.sol_request import SolRequest
 from parser.sol_parser import check_transaction, sign_transaction
-from shield import shield
 import json, traceback
 
-sol_bp = Blueprint('sol', __name__)
 
-
-@sol_bp.route('/sign', methods=['POST'])
-def sign():
-    data = g.data
-    
-    if "pass" not in session or session["pass"] != shield.SHIELD.auth_password:
-        print("Unauthorized")
-        return jsonify({"error": "Unauthorized"}), 401
+def sign(data):
 
     function = data.get("function")
     transaction = data.get("transaction")
@@ -21,7 +12,7 @@ def sign():
     void_keypair = data.get("void_keypair")
     tokenaddress = data.get("tokenaddress")
     if not transaction or not sign_address:
-        return jsonify({"error": "Invalid data"}), 400
+        return {"error": "Invalid data"}
     
     req = SolRequest.create(transaction=json.dumps(transaction), sign_address=sign_address, function=function)
     
@@ -32,7 +23,7 @@ def sign():
             req.info = check_res["error"]
             req.save()
             print("Error Found", check_res["error"])
-            return jsonify(check_res), 400
+            return check_res
 
         signature = sign_transaction(transaction, void_keypair)
         if "error" in signature:
@@ -40,19 +31,19 @@ def sign():
             req.info = signature["error"]
             req.save()
             print("Error Found", signature["error"])
-            return jsonify(signature), 400
+            return signature
 
         req.signature = signature["result"]
         req.status = "success"
         req.save()
-        return jsonify({"signature": signature}), 200
+        return {"signature": signature}
     except:
         req.status = "fatal_error"
         req.info = traceback.format_exc()
         req.save()
         print("Fatal Error", traceback.format_exc())
-        return jsonify({
+        return {
             "error": "Fatal Error!" + traceback.format_exc()
-        }), 400
+        }
 
 

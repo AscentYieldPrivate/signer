@@ -3,18 +3,6 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from solders.keypair import Keypair
 
-# 用AES算法，enword作为密钥解密数据
-# using AES algorithm with enword as key to decrypt data
-def decrypt_data(enword, data):
-    cipher = AES.new(pad(enword.encode(), AES.block_size), AES.MODE_ECB)
-    return unpad(cipher.decrypt(data), AES.block_size)
-
-# 用AES算法，enword作为密钥加密数据
-# using AES algorithm with enword as key to encrypt data
-def encrypt_data(enword, data):
-    cipher = AES.new(pad(enword.encode(), AES.block_size), AES.MODE_ECB)
-    return cipher.encrypt(pad(data, AES.block_size))
-
 # 用AES算法，enword作为密钥解密数字类型的数据
 # using AES algorithm with enword as key to decrypt data of number type
 def decrypt_data_from_int(enword, private_key_encrypt_for_print_number):
