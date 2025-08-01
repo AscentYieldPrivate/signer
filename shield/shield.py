@@ -29,10 +29,16 @@ class Shield:
         
         with open("sol_" + self.address + "/binance_address.txt", "r") as f:
             self.binance_address = f.readline().strip()
-            
-        self.simple_password = getpass.getpass("Input your private key password:")
-        with self.get_private_key() as private_key:
-            assert self.address == str(Keypair.from_base58_string(private_key).pubkey())
+        
+        while True:
+            self.simple_password = getpass.getpass("Input your private key password:")
+            try:
+                with self.get_private_key() as private_key:
+                    assert self.address == str(Keypair.from_base58_string(private_key).pubkey())
+            except Exception as e:
+                print("Password Error! Please input again!")
+                continue
+            break
         
 
     @contextlib.contextmanager
