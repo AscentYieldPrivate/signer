@@ -25,7 +25,7 @@ def sign(data):
             print("Error Found", check_res["error"])
             return check_res
 
-        signature = sign_transaction(transaction, void_keypair)
+        signature = sign_transaction(transaction, void_keypair, function)
         if "error" in signature:
             req.status = "sign_error"
             req.info = signature["error"]
